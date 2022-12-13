@@ -26,10 +26,11 @@ class TZFE:
         print('\nGenerate new numbers')
         print(self)
 
-    def up(self):
+    def up(self) -> bool:
         """
-            swipe up, 向上滑动
+            swipe up, 向上滑动, 返回值表示此操作是否可以进行
         """
+        pre_board = copy.deepcopy(self.board)
         for col in range(4):
             #  do merging for each column
             num_list = []
@@ -45,11 +46,16 @@ class TZFE:
                 i += 1
             for i in range(num_list.__len__()):
                 self.board[i][col] = num_list[i]
+        if pre_board == self.board:
+            return False
+        else:
+            return True
 
-    def down(self):
+    def down(self) -> bool:
         """
-            swipe down, 向下滑动
+            swipe down, 向下滑动, 返回值表示此操作是否可以进行
         """
+        pre_board = copy.deepcopy(self.board)
         for col in range(4):
             #  do merging for each column
             num_list = []
@@ -62,14 +68,19 @@ class TZFE:
                 if num_list[i] == num_list[i - 1]:
                     num_list[i] *= 2
                     num_list.pop(i - 1)
-                i -= 1
+                i -= 2
             for i in range(num_list.__len__()):
                 self.board[i + 4 - num_list.__len__()][col] = num_list[i]
+        if pre_board == self.board:
+            return False
+        else:
+            return True
 
     def left(self):
         """
-            swipe left, 向左滑动
+            swipe left, 向左滑动, 返回值表示此操作是否可以进行
         """
+        pre_board = copy.deepcopy(self.board)
         for row in range(4):
             # do merging for each row
             num_list = []
@@ -85,11 +96,16 @@ class TZFE:
                 i += 1
             for i in range(num_list.__len__()):
                 self.board[row][i] = num_list[i]
+        if pre_board == self.board:
+            return False
+        else:
+            return True
 
     def right(self):
         """
-            swipe right, 向右移动
+            swipe right, 向右移动, 返回值表示此操作是否可以进行
         """
+        pre_board = copy.deepcopy(self.board)
         for row in range(4):
             # do merging for each row
             num_list = []
@@ -102,9 +118,13 @@ class TZFE:
                 if num_list[i] == num_list[i - 1]:
                     num_list[i] *= 2
                     num_list.pop(i - 1)
-                i -= 1
+                i -= 2
             for i in range(num_list.__len__()):
                 self.board[row][i + 4 - num_list.__len__()] = num_list[i]
+        if pre_board == self.board:
+            return False
+        else:
+            return True
 
     def get_total(self) -> int:
         """
@@ -124,24 +144,34 @@ class TZFE:
         dictionary = dict()
 
         left = copy.deepcopy(self)
-        left.left()
-        dictionary['l'] = left.get_total()
+        if left.left():
+            dictionary['l'] = left.get_total()
+        else:
+            dictionary['l'] = 17
 
         right = copy.deepcopy(self)
-        right.right()
-        dictionary['r'] = right.get_total()
+        if right.right():
+            dictionary['r'] = right.get_total()
+        else:
+            dictionary['r'] = 17
 
         up = copy.deepcopy(self)
-        up.up()
-        dictionary['u'] = up.get_total()
+        if up.up():
+            dictionary['u'] = up.get_total()
+        else:
+            dictionary['u'] = 17
 
         down = copy.deepcopy(self)
-        down.down()
-        dictionary['d'] = down.get_total()
+        if down.down():
+            dictionary['d'] = down.get_total()
+        else:
+            dictionary['d'] = 17
 
-        best = sorted(dictionary.items(), key=lambda x: x[1])[0]
+        best = sorted(dictionary.items(), key=lambda x: x[1])
+        if best[0][1] == 17:
+            return 'dead'
         print("Consider result is " + str(best))
-        return best
+        return best[0][0]
 
     def game(self):
         while True:
